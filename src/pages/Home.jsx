@@ -10,7 +10,7 @@ const DEPARTMENTS_UI = [
   { 
     name: 'Computer Science', 
     icon: Cpu, 
-    image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=800&auto=format&fit=crop'
+    image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=800&auto=format&fit=crop'
   },
   { 
     name: 'Electronics & Telecommunication', 
