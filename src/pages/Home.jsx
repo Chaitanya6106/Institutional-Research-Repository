@@ -14,7 +14,6 @@ const DEPARTMENTS_UI = [
   { name: 'Artificial Intelligence & ML', icon: Brain },
 ];
 
-// File list mappings based on repository folders
 const FOLDER_PAPERS = {
   'Artificial Intelligence & ML': [
     'A Review on Explainable Artificial',
@@ -78,9 +77,7 @@ const FOLDER_PAPERS = {
   ]
 };
 
-// Exact publication year mapping per paper title/keyword
 const EXACT_PAPER_YEARS = {
-  // Civil & Structural Engineering Papers
   'cracks in the foundation': '2021',
   'digital infrastructure in astrophys': '2022',
   'domain adaptation in structural hea': '2023',
@@ -91,8 +88,6 @@ const EXACT_PAPER_YEARS = {
   'resilience evaluation framework': '2023',
   'state of the art of augmented reali': '2020',
   'twoscale optimization': '2023',
-
-  // Computer Science Papers
   'building bridges': '2022',
   'challenges for inclusion': '2021',
   'challenges for verifying': '2019',
@@ -103,8 +98,6 @@ const EXACT_PAPER_YEARS = {
   'pulsar science': '2025',
   'the present and future of bots': '2022',
   'vision based game development': '2010',
-
-  // Artificial Intelligence & ML Papers
   'review on explainable artificial': '2023',
   'artificial intelligence and economi': '2022',
   'artificial intelligence framework f': '2024',
@@ -115,8 +108,6 @@ const EXACT_PAPER_YEARS = {
   'helpfulness of explain': '2023',
   'the artificial scientist logicist': '2022',
   'watershed of artificial intelligenc': '2024',
-
-  // Electronics & Telecommunication Papers
   'accessbased lightweight': '2023',
   'cells in the internet of things': '2015',
   'distributed continuous rangeskylin': '2019',
@@ -127,8 +118,6 @@ const EXACT_PAPER_YEARS = {
   'privacybydesign framework': '2017',
   'sensedeliberateact': '2020',
   'the internet of things perspective': '2016',
-
-  // Mechanical & Robotics Papers
   'survey of robot manipulation': '2022',
   'action flow matching': '2025',
   'design of an adaptive lightweight': '2024',
@@ -141,7 +130,6 @@ const EXACT_PAPER_YEARS = {
   'xiaomirobotics1': '2025'
 };
 
-// Keywords that return real results from your dataset
 const TRENDING_KEYWORDS = [
   'Artificial Intelligence',
   'Robotics',
@@ -151,7 +139,6 @@ const TRENDING_KEYWORDS = [
   'Optimization'
 ];
 
-// Rotating Featured Paper Pool (Changes on Page Refresh)
 const FEATURED_POOL = [
   {
     id: 1,
@@ -226,7 +213,6 @@ export default function Home() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Pick a random featured paper every time the component loads
     const randomIndex = Math.floor(Math.random() * FEATURED_POOL.length);
     setFeaturedPaper(FEATURED_POOL[randomIndex]);
 
@@ -299,33 +285,25 @@ export default function Home() {
   return (
     <div className="space-y-12 pb-16">
       
-      {/* Hero Header - Dual Blend Campus Architecture & Research Data */}
+      {/* Hero Header with High-Visibility Background Image */}
       <section className="relative text-white py-20 px-4 text-center rounded-b-3xl shadow-xl overflow-hidden bg-slate-950">
         
-        {/* Layer 1: Institutional Campus Architecture Texture */}
+        {/* Clear, High-Visibility Background Image */}
         <div 
-          className="absolute inset-0 bg-cover bg-center mix-blend-luminosity opacity-25 scale-105 transition-transform duration-1000"
+          className="absolute inset-0 bg-cover bg-center opacity-60"
           style={{
             backgroundImage: `url('https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?q=80&w=2069&auto=format&fit=crop')`
           }}
         />
 
-        {/* Layer 2: Research Paper & Academic Data Texture Overlay */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center mix-blend-color-dodge opacity-20"
-          style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=2000&auto=format&fit=crop')`
-          }}
-        />
-
-        {/* Layer 3: Vignette Gradient Overlay for Readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-slate-950/90 to-slate-950" />
+        {/* Light Tint Gradient Overlay so Text Remains Sharp */}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-slate-950/60 to-slate-950/80" />
 
         <div className="max-w-4xl mx-auto space-y-6 relative z-10">
-          <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-white drop-shadow-lg">
+          <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-white drop-shadow-2xl">
             Institutional Research Repository
           </h1>
-          <p className="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto font-normal leading-relaxed">
+          <p className="text-slate-100 text-base sm:text-lg max-w-2xl mx-auto font-medium leading-relaxed drop-shadow">
             Discover, cite, and contribute to academic papers, student theses, and faculty publications.
           </p>
 
