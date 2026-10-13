@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import { 
-  Search, FileText, Download, TrendingUp, Users, BookMarked, 
-  Cpu, Zap, Cog, Building2, Brain, ChevronRight, Award, ExternalLink, ArrowUpRight 
+  Search, FileText, Download, TrendingUp, Users, BookMarked, Bookmark,
+  Cpu, Zap, Cog, Building2, Brain, ChevronRight, Award, ExternalLink, ArrowUpRight, Trash2 
 } from 'lucide-react';
 
 const DEPARTMENTS_UI = [
@@ -229,6 +229,7 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDepts, setSelectedDepts] = useState([]);
   const [recentPapers, setRecentPapers] = useState([]);
+  const [bookmarkedPapers, setBookmarkedPapers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [featuredPaper, setFeaturedPaper] = useState(FEATURED_POOL[0]);
 
@@ -239,7 +240,24 @@ export default function Home() {
     setFeaturedPaper(FEATURED_POOL[randomIndex]);
 
     fetchPapers();
+    loadBookmarks();
   }, [selectedDepts]);
+
+  const loadBookmarks = () => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('bookmarked_papers') || '[]');
+      setBookmarkedPapers(saved);
+    } catch (e) {
+      console.error('Failed to load bookmarks', e);
+      setBookmarkedPapers([]);
+    }
+  };
+
+  const removeBookmark = (paperId) => {
+    const updated = bookmarkedPapers.filter(p => (p.id || p.paper_id) !== paperId);
+    setBookmarkedPapers(updated);
+    localStorage.setItem('bookmarked_papers', JSON.stringify(updated));
+  };
 
   const fetchPapers = async () => {
     try {
@@ -410,6 +428,63 @@ export default function Home() {
               );
             })}
           </div>
+        </section>
+
+        {/* BOOKMARKED PAPERS SECTION */}
+        <section className="bg-indigo-950/5 border border-indigo-100 rounded-2xl p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-4 border-b border-indigo-100 pb-3">
+            <div className="flex items-center gap-2">
+              <Bookmark className="w-5 h-5 text-indigo-600 fill-indigo-600" />
+              <h2 className="text-xl font-bold text-slate-900">Your Bookmarked Research</h2>
+            </div>
+            <span className="text-xs font-bold bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full">
+              {bookmarkedPapers.length} {bookmarkedPapers.length === 1 ? 'Saved Paper' : 'Saved Papers'}
+            </span>
+          </div>
+
+          {bookmarkedPapers.length === 0 ? (
+            <div className="text-center py-8 bg-white rounded-xl border border-dashed border-slate-200 space-y-2">
+              <BookMarked className="w-8 h-8 text-slate-300 mx-auto" />
+              <p className="text-sm font-semibold text-slate-600">No bookmarked papers yet</p>
+              <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                Click the <strong className="text-indigo-600">"Bookmark"</strong> button on any paper view page to save research here for quick access.
+              </p>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {bookmarkedPapers.map((paper) => {
+                const paperId = paper.id || paper.paper_id;
+                return (
+                  <div key={paperId} className="bg-white p-4 rounded-xl border border-slate-200 hover:border-indigo-300 hover:shadow-md transition flex flex-col justify-between space-y-3">
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-[10px] font-bold uppercase tracking-wider bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-md">
+                          {getDeptTag(paper)}
+                        </span>
+                        <button 
+                          onClick={() => removeBookmark(paperId)}
+                          className="text-slate-400 hover:text-red-500 transition p-1"
+                          title="Remove bookmark"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <Link to={`/paper/${paperId}`} className="font-bold text-slate-900 hover:text-indigo-600 text-sm line-clamp-2 leading-snug">
+                        {paper.title}
+                      </Link>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
+                      <span className="text-slate-500">Year: {getPaperYear(paper)}</span>
+                      <Link to={`/paper/${paperId}`} className="font-bold text-indigo-600 hover:underline flex items-center gap-1">
+                        Open Paper <ChevronRight className="w-3.5 h-3.5" />
+                      </Link>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </section>
 
         {/* Paper Sections Grid */}
