@@ -10,32 +10,27 @@ const DEPARTMENTS_UI = [
   { 
     name: 'Computer Science', 
     icon: Cpu, 
-    count: '10 Papers',
-    image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=600&auto=format&fit=crop'
+    image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=800&auto=format&fit=crop'
   },
   { 
     name: 'Electronics & Telecommunication', 
     icon: Zap, 
-    count: '10 Papers',
-    image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=600&auto=format&fit=crop'
+    image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800&auto=format&fit=crop'
   },
   { 
     name: 'Mechanical Engineering', 
     icon: Cog, 
-    count: '10 Papers',
-    image: 'https://images.unsplash.com/photo-1537462715879-360eeb61a0ad?q=80&w=600&auto=format&fit=crop'
+    image: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=800&auto=format&fit=crop'
   },
   { 
     name: 'Civil Engineering', 
     icon: Building2, 
-    count: '10 Papers',
-    image: 'https://images.unsplash.com/photo-1541888946425-d0fbb186a5b3?q=80&w=600&auto=format&fit=crop'
+    image: 'https://images.unsplash.com/photo-1541888946425-d0fbb186a5b3?q=80&w=800&auto=format&fit=crop'
   },
   { 
     name: 'Artificial Intelligence & ML', 
     icon: Brain, 
-    count: '10 Papers',
-    image: 'https://images.unsplash.com/photo-1677442136019-21780efad99a?q=80&w=600&auto=format&fit=crop'
+    image: 'https://images.unsplash.com/photo-1677442136019-21780efad99a?q=80&w=800&auto=format&fit=crop'
   },
 ];
 
@@ -369,26 +364,26 @@ export default function Home() {
                   onClick={() => toggleDept(dept.name)}
                   className={`group relative overflow-hidden p-5 rounded-2xl border text-left transition-all duration-300 ease-out flex flex-col justify-between h-40 cursor-pointer ${
                     isSelected
-                      ? 'border-indigo-600 bg-indigo-900 text-white shadow-xl ring-2 ring-indigo-500/30 -translate-y-1'
+                      ? 'border-indigo-600 bg-indigo-950 text-white shadow-xl ring-2 ring-indigo-500/30 -translate-y-1'
                       : 'border-slate-200 bg-white hover:border-indigo-400 hover:shadow-xl hover:-translate-y-1'
                   }`}
                 >
-                  {/* Department Photo Background Fade-In on Hover */}
+                  {/* Department Image Fade-In Backdrop */}
                   <div 
-                    className={`absolute inset-0 bg-cover bg-center transition-opacity duration-500 ${
-                      isSelected ? 'opacity-35 scale-105' : 'opacity-0 group-hover:opacity-25 group-hover:scale-105'
+                    className={`absolute inset-0 bg-cover bg-center transition-all duration-500 ${
+                      isSelected ? 'opacity-40 scale-105' : 'opacity-0 group-hover:opacity-35 group-hover:scale-105'
                     }`}
                     style={{ backgroundImage: `url(${dept.image})` }}
                   />
-                  <div className={`absolute inset-0 bg-gradient-to-t transition-opacity duration-300 ${
+                  <div className={`absolute inset-0 transition-opacity duration-300 ${
                     isSelected 
-                      ? 'from-indigo-950 via-indigo-950/80 to-transparent' 
-                      : 'from-slate-900/80 via-slate-900/30 to-transparent opacity-0 group-hover:opacity-100'
+                      ? 'bg-gradient-to-t from-indigo-950 via-indigo-950/70 to-transparent' 
+                      : 'bg-gradient-to-t from-slate-950/80 via-slate-950/40 to-transparent opacity-0 group-hover:opacity-100'
                   }`} />
 
-                  {/* Top Bar: Icon + Badge + Arrow */}
+                  {/* Top Icon & Arrow Indicator */}
                   <div className="relative z-10 flex items-center justify-between">
-                    <div className={`p-2 rounded-xl transition-all duration-300 ${
+                    <div className={`p-2.5 rounded-xl transition-all duration-300 ${
                       isSelected 
                         ? 'bg-indigo-500/30 text-white' 
                         : 'bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white'
@@ -396,26 +391,17 @@ export default function Home() {
                       <Icon className="w-5 h-5" />
                     </div>
                     
-                    <div className="flex items-center gap-1.5">
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border transition-colors ${
-                        isSelected 
-                          ? 'bg-indigo-500/30 text-indigo-200 border-indigo-400/40' 
-                          : 'bg-slate-100 text-slate-600 border-slate-200/80 group-hover:bg-white group-hover:text-slate-800'
-                      }`}>
-                        {dept.count}
-                      </span>
-                      <ArrowUpRight className={`w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 ${
-                        isSelected ? 'text-indigo-200' : 'text-slate-400 group-hover:text-indigo-600'
-                      }`} />
-                    </div>
+                    <ArrowUpRight className={`w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 ${
+                      isSelected ? 'text-indigo-200' : 'text-slate-400 group-hover:text-white'
+                    }`} />
                   </div>
 
-                  {/* Bottom Bar: Title */}
+                  {/* Department Title */}
                   <div className="relative z-10 space-y-1">
                     <h3 className={`font-extrabold text-sm leading-snug transition-colors duration-200 ${
                       isSelected 
                         ? 'text-white' 
-                        : 'text-slate-800 group-hover:text-indigo-600'
+                        : 'text-slate-800 group-hover:text-white drop-shadow-md'
                     }`}>
                       {dept.name}
                     </h3>
