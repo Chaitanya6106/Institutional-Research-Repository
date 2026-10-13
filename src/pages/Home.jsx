@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import { 
   Search, FileText, Download, TrendingUp, Users, BookMarked, Bookmark,
-  Cpu, Zap, Cog, Building2, Brain, ChevronRight, Award, ExternalLink, ArrowUpRight, Trash2 
+  Cpu, Zap, Cog, Building2, Brain, ChevronRight, Award, ExternalLink, ArrowUpRight, Trash2, X 
 } from 'lucide-react';
 
 const DEPARTMENTS_UI = [
@@ -230,6 +230,7 @@ export default function Home() {
   const [selectedDepts, setSelectedDepts] = useState([]);
   const [recentPapers, setRecentPapers] = useState([]);
   const [bookmarkedPapers, setBookmarkedPapers] = useState([]);
+  const [showBookmarkModal, setShowBookmarkModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [featuredPaper, setFeaturedPaper] = useState(FEATURED_POOL[0]);
 
@@ -240,15 +241,32 @@ export default function Home() {
     setFeaturedPaper(FEATURED_POOL[randomIndex]);
 
     fetchPapers();
-    loadBookmarks();
   }, [selectedDepts]);
 
-  const loadBookmarks = () => {
+  const loadBookmarks = (allDbPapers = []) => {
     try {
-      const saved = JSON.parse(localStorage.getItem('bookmarked_papers') || '[]');
-      setBookmarkedPapers(saved);
+      // Check multiple common key variations for saved bookmarks
+      const raw1 = localStorage.getItem('bookmarkedPapers');
+      const raw2 = localStorage.getItem('bookmarked_papers');
+      const raw3 = localStorage.getItem('bookmarks');
+
+      const parsed = JSON.parse(raw1 || raw2 || raw3 || '[]');
+
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        // Handle case where array stores objects or plain IDs/strings
+        if (typeof parsed[0] === 'object' && parsed[0] !== null) {
+          setBookmarkedPapers(parsed);
+        } else if (allDbPapers.length > 0) {
+          const matched = allDbPapers.filter(p => 
+            parsed.includes(p.id) || parsed.includes(p.paper_id) || parsed.includes(String(p.id)) || parsed.includes(String(p.paper_id))
+          );
+          setBookmarkedPapers(matched);
+        }
+      } else {
+        setBookmarkedPapers([]);
+      }
     } catch (e) {
-      console.error('Failed to load bookmarks', e);
+      console.error('Failed to parse bookmarks:', e);
       setBookmarkedPapers([]);
     }
   };
@@ -256,7 +274,11 @@ export default function Home() {
   const removeBookmark = (paperId) => {
     const updated = bookmarkedPapers.filter(p => (p.id || p.paper_id) !== paperId);
     setBookmarkedPapers(updated);
+
+    // Sync across localStorage keys
+    localStorage.setItem('bookmarkedPapers', JSON.stringify(updated));
     localStorage.setItem('bookmarked_papers', JSON.stringify(updated));
+    localStorage.setItem('bookmarks', JSON.stringify(updated.map(p => p.id || p.paper_id)));
   };
 
   const fetchPapers = async () => {
@@ -281,6 +303,8 @@ export default function Home() {
         setIsLoading(false);
         return;
       }
+
+      loadBookmarks(allPapers);
 
       if (selectedDepts.length > 0) {
         let finalFiltered = [];
@@ -353,7 +377,7 @@ export default function Home() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         
-        {/* Department Filter Section with Interactive Image Hover Cards */}
+        {/* Department Filter Section with Bookmarks Quick Button */}
         <section>
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -367,9 +391,24 @@ export default function Home() {
                 </button>
               )}
             </div>
-            <Link to="/search" className="text-indigo-600 hover:text-indigo-800 text-sm font-semibold flex items-center gap-1">
-              View All <ChevronRight className="w-4 h-4" />
-            </Link>
+
+            <div className="flex items-center gap-3">
+              {/* Compact Bookmark Modal Trigger Button */}
+              <button
+                onClick={() => setShowBookmarkModal(true)}
+                className="inline-flex items-center gap-2 bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-900 px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm"
+              >
+                <Bookmark className="w-4 h-4 fill-amber-500 text-amber-600" />
+                <span>Bookmarks</span>
+                <span className="bg-amber-200/80 text-amber-900 px-2 py-0.5 rounded-full text-[11px] font-black">
+                  {bookmarkedPapers.length}
+                </span>
+              </button>
+
+              <Link to="/search" className="text-indigo-600 hover:text-indigo-800 text-sm font-semibold flex items-center gap-1">
+                View All <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
@@ -386,7 +425,6 @@ export default function Home() {
                       : 'border-slate-200 bg-white hover:border-indigo-400 hover:shadow-xl hover:-translate-y-1'
                   }`}
                 >
-                  {/* Department Image Fade-In Backdrop */}
                   <div 
                     className={`absolute inset-0 bg-cover bg-center transition-all duration-500 ${
                       isSelected ? 'opacity-40 scale-105' : 'opacity-0 group-hover:opacity-35 group-hover:scale-105'
@@ -399,7 +437,6 @@ export default function Home() {
                       : 'bg-gradient-to-t from-slate-950/80 via-slate-950/40 to-transparent opacity-0 group-hover:opacity-100'
                   }`} />
 
-                  {/* Top Icon & Arrow Indicator */}
                   <div className="relative z-10 flex items-center justify-between">
                     <div className={`p-2.5 rounded-xl transition-all duration-300 ${
                       isSelected 
@@ -414,7 +451,6 @@ export default function Home() {
                     }`} />
                   </div>
 
-                  {/* Department Title */}
                   <div className="relative z-10 space-y-1">
                     <h3 className={`font-extrabold text-sm leading-snug transition-colors duration-200 ${
                       isSelected 
@@ -428,63 +464,6 @@ export default function Home() {
               );
             })}
           </div>
-        </section>
-
-        {/* BOOKMARKED PAPERS SECTION */}
-        <section className="bg-indigo-950/5 border border-indigo-100 rounded-2xl p-6 shadow-sm">
-          <div className="flex items-center justify-between mb-4 border-b border-indigo-100 pb-3">
-            <div className="flex items-center gap-2">
-              <Bookmark className="w-5 h-5 text-indigo-600 fill-indigo-600" />
-              <h2 className="text-xl font-bold text-slate-900">Your Bookmarked Research</h2>
-            </div>
-            <span className="text-xs font-bold bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full">
-              {bookmarkedPapers.length} {bookmarkedPapers.length === 1 ? 'Saved Paper' : 'Saved Papers'}
-            </span>
-          </div>
-
-          {bookmarkedPapers.length === 0 ? (
-            <div className="text-center py-8 bg-white rounded-xl border border-dashed border-slate-200 space-y-2">
-              <BookMarked className="w-8 h-8 text-slate-300 mx-auto" />
-              <p className="text-sm font-semibold text-slate-600">No bookmarked papers yet</p>
-              <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                Click the <strong className="text-indigo-600">"Bookmark"</strong> button on any paper view page to save research here for quick access.
-              </p>
-            </div>
-          ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {bookmarkedPapers.map((paper) => {
-                const paperId = paper.id || paper.paper_id;
-                return (
-                  <div key={paperId} className="bg-white p-4 rounded-xl border border-slate-200 hover:border-indigo-300 hover:shadow-md transition flex flex-col justify-between space-y-3">
-                    <div className="space-y-1.5">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="text-[10px] font-bold uppercase tracking-wider bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-md">
-                          {getDeptTag(paper)}
-                        </span>
-                        <button 
-                          onClick={() => removeBookmark(paperId)}
-                          className="text-slate-400 hover:text-red-500 transition p-1"
-                          title="Remove bookmark"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                      <Link to={`/paper/${paperId}`} className="font-bold text-slate-900 hover:text-indigo-600 text-sm line-clamp-2 leading-snug">
-                        {paper.title}
-                      </Link>
-                    </div>
-
-                    <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
-                      <span className="text-slate-500">Year: {getPaperYear(paper)}</span>
-                      <Link to={`/paper/${paperId}`} className="font-bold text-indigo-600 hover:underline flex items-center gap-1">
-                        Open Paper <ChevronRight className="w-3.5 h-3.5" />
-                      </Link>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
         </section>
 
         {/* Paper Sections Grid */}
@@ -631,6 +610,92 @@ export default function Home() {
         </section>
 
       </div>
+
+      {/* BOOKMARKS OVERLAY MODAL */}
+      {showBookmarkModal && (
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-slate-200 space-y-4 relative animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <Bookmark className="w-5 h-5 fill-amber-500 text-amber-600" />
+                <h3 className="text-lg font-bold text-slate-900">Bookmarked Research</h3>
+              </div>
+              <button
+                onClick={() => setShowBookmarkModal(false)}
+                className="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {bookmarkedPapers.length === 0 ? (
+              <div className="text-center py-10 space-y-2">
+                <BookMarked className="w-10 h-10 text-slate-300 mx-auto" />
+                <p className="text-sm font-semibold text-slate-700">No bookmarked papers found</p>
+                <p className="text-xs text-slate-400 max-w-xs mx-auto">
+                  Click the <strong>Bookmark</strong> button on paper pages to save them for quick viewing here.
+                </p>
+              </div>
+            ) : (
+              <div className="max-h-[360px] overflow-y-auto space-y-2.5 pr-1">
+                {bookmarkedPapers.map((paper) => {
+                  const paperId = paper.id || paper.paper_id;
+                  return (
+                    <div 
+                      key={paperId}
+                      className="p-3 rounded-xl border border-slate-200 hover:border-indigo-300 bg-slate-50/50 flex items-center justify-between gap-4 transition"
+                    >
+                      <div className="space-y-1">
+                        <Link 
+                          to={`/paper/${paperId}`} 
+                          onClick={() => setShowBookmarkModal(false)}
+                          className="font-bold text-slate-900 hover:text-indigo-600 text-sm line-clamp-1 block"
+                        >
+                          📄 {paper.title}
+                        </Link>
+                        <div className="flex items-center gap-2 text-xs text-slate-500">
+                          <span className="bg-slate-200/80 px-2 py-0.5 rounded text-indigo-600 font-medium">
+                            {getDeptTag(paper)}
+                          </span>
+                          <span>•</span>
+                          <span>Year: {getPaperYear(paper)}</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <Link
+                          to={`/paper/${paperId}`}
+                          onClick={() => setShowBookmarkModal(false)}
+                          className="text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg transition"
+                        >
+                          View
+                        </Link>
+                        <button
+                          onClick={() => removeBookmark(paperId)}
+                          className="text-slate-400 hover:text-red-500 p-1.5 transition"
+                          title="Remove bookmark"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            <div className="pt-2 text-right">
+              <button
+                onClick={() => setShowBookmarkModal(false)}
+                className="text-xs font-semibold text-slate-600 hover:text-slate-900 px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 transition"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
