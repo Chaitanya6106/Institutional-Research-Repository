@@ -30,7 +30,7 @@ const DEPARTMENTS_UI = [
   { 
     name: 'Artificial Intelligence & ML', 
     icon: Brain, 
-    image: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?q=80&w=800&auto=format&fit=crop'
+    image: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=800&auto=format&fit=crop'
   },
 ];
 
