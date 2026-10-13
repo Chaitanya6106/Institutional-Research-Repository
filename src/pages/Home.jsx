@@ -10,7 +10,7 @@ const DEPARTMENTS_UI = [
   { 
     name: 'Computer Science', 
     icon: Cpu, 
-    image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=800&auto=format&fit=crop'
+    image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=800&auto=format&fit=crop'
   },
   { 
     name: 'Electronics & Telecommunication', 
@@ -20,7 +20,7 @@ const DEPARTMENTS_UI = [
   { 
     name: 'Mechanical Engineering', 
     icon: Cog, 
-    image: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=800&auto=format&fit=crop'
+    image: 'https://images.unsplash.com/photo-1537462715879-360eeb61a0ad?q=80&w=800&auto=format&fit=crop'
   },
   { 
     name: 'Civil Engineering', 
