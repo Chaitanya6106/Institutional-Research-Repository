@@ -3,17 +3,43 @@ import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import { 
   Search, FileText, Download, TrendingUp, Users, BookMarked, 
-  Cpu, Zap, Cog, Building2, Brain, ChevronRight, Award, ExternalLink 
+  Cpu, Zap, Cog, Building2, Brain, ChevronRight, Award, ExternalLink, ArrowUpRight 
 } from 'lucide-react';
 
 const DEPARTMENTS_UI = [
-  { name: 'Computer Science', icon: Cpu },
-  { name: 'Electronics & Telecommunication', icon: Zap },
-  { name: 'Mechanical Engineering', icon: Cog },
-  { name: 'Civil Engineering', icon: Building2 },
-  { name: 'Artificial Intelligence & ML', icon: Brain },
+  { 
+    name: 'Computer Science', 
+    icon: Cpu, 
+    count: '10 Papers',
+    image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=600&auto=format&fit=crop'
+  },
+  { 
+    name: 'Electronics & Telecommunication', 
+    icon: Zap, 
+    count: '10 Papers',
+    image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=600&auto=format&fit=crop'
+  },
+  { 
+    name: 'Mechanical Engineering', 
+    icon: Cog, 
+    count: '10 Papers',
+    image: 'https://images.unsplash.com/photo-1537462715879-360eeb61a0ad?q=80&w=600&auto=format&fit=crop'
+  },
+  { 
+    name: 'Civil Engineering', 
+    icon: Building2, 
+    count: '10 Papers',
+    image: 'https://images.unsplash.com/photo-1541888946425-d0fbb186a5b3?q=80&w=600&auto=format&fit=crop'
+  },
+  { 
+    name: 'Artificial Intelligence & ML', 
+    icon: Brain, 
+    count: '10 Papers',
+    image: 'https://images.unsplash.com/photo-1677442136019-21780efad99a?q=80&w=600&auto=format&fit=crop'
+  },
 ];
 
+// File list mappings based on repository folders
 const FOLDER_PAPERS = {
   'Artificial Intelligence & ML': [
     'A Review on Explainable Artificial',
@@ -77,6 +103,7 @@ const FOLDER_PAPERS = {
   ]
 };
 
+// Exact publication year mapping per paper title/keyword
 const EXACT_PAPER_YEARS = {
   'cracks in the foundation': '2021',
   'digital infrastructure in astrophys': '2022',
@@ -285,25 +312,13 @@ export default function Home() {
   return (
     <div className="space-y-12 pb-16">
       
-      {/* Hero Header with High-Visibility Background Image */}
+      {/* Hero Header */}
       <section className="relative text-white py-20 px-4 text-center rounded-b-3xl shadow-xl overflow-hidden bg-slate-950">
-        
-        {/* Clear, High-Visibility Background Image */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center opacity-60"
-          style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?q=80&w=2069&auto=format&fit=crop')`
-          }}
-        />
-
-        {/* Light Tint Gradient Overlay so Text Remains Sharp */}
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-slate-950/60 to-slate-950/80" />
-
         <div className="max-w-4xl mx-auto space-y-6 relative z-10">
           <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-white drop-shadow-2xl">
             Institutional Research Repository
           </h1>
-          <p className="text-slate-100 text-base sm:text-lg max-w-2xl mx-auto font-medium leading-relaxed drop-shadow">
+          <p className="text-slate-200 text-base sm:text-lg max-w-2xl mx-auto font-medium leading-relaxed drop-shadow">
             Discover, cite, and contribute to academic papers, student theses, and faculty publications.
           </p>
 
@@ -325,7 +340,7 @@ export default function Home() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         
-        {/* Department Filter Section */}
+        {/* Department Filter Section with Interactive Image Hover Cards */}
         <section>
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -352,17 +367,58 @@ export default function Home() {
                 <button
                   key={dept.name}
                   onClick={() => toggleDept(dept.name)}
-                  className={`p-4 rounded-xl border text-left transition flex flex-col justify-between h-32 cursor-pointer ${
+                  className={`group relative overflow-hidden p-5 rounded-2xl border text-left transition-all duration-300 ease-out flex flex-col justify-between h-40 cursor-pointer ${
                     isSelected
-                      ? 'border-indigo-600 bg-indigo-50/80 shadow-md ring-2 ring-indigo-500/20'
-                      : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow'
+                      ? 'border-indigo-600 bg-indigo-900 text-white shadow-xl ring-2 ring-indigo-500/30 -translate-y-1'
+                      : 'border-slate-200 bg-white hover:border-indigo-400 hover:shadow-xl hover:-translate-y-1'
                   }`}
                 >
-                  <div className="flex items-center justify-between">
-                    <Icon className={`w-6 h-6 ${isSelected ? 'text-indigo-600' : 'text-slate-600'}`} />
+                  {/* Department Photo Background Fade-In on Hover */}
+                  <div 
+                    className={`absolute inset-0 bg-cover bg-center transition-opacity duration-500 ${
+                      isSelected ? 'opacity-35 scale-105' : 'opacity-0 group-hover:opacity-25 group-hover:scale-105'
+                    }`}
+                    style={{ backgroundImage: `url(${dept.image})` }}
+                  />
+                  <div className={`absolute inset-0 bg-gradient-to-t transition-opacity duration-300 ${
+                    isSelected 
+                      ? 'from-indigo-950 via-indigo-950/80 to-transparent' 
+                      : 'from-slate-900/80 via-slate-900/30 to-transparent opacity-0 group-hover:opacity-100'
+                  }`} />
+
+                  {/* Top Bar: Icon + Badge + Arrow */}
+                  <div className="relative z-10 flex items-center justify-between">
+                    <div className={`p-2 rounded-xl transition-all duration-300 ${
+                      isSelected 
+                        ? 'bg-indigo-500/30 text-white' 
+                        : 'bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white'
+                    }`}>
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    
+                    <div className="flex items-center gap-1.5">
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border transition-colors ${
+                        isSelected 
+                          ? 'bg-indigo-500/30 text-indigo-200 border-indigo-400/40' 
+                          : 'bg-slate-100 text-slate-600 border-slate-200/80 group-hover:bg-white group-hover:text-slate-800'
+                      }`}>
+                        {dept.count}
+                      </span>
+                      <ArrowUpRight className={`w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 ${
+                        isSelected ? 'text-indigo-200' : 'text-slate-400 group-hover:text-indigo-600'
+                      }`} />
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-slate-900 text-sm leading-snug">{dept.name}</h3>
+
+                  {/* Bottom Bar: Title */}
+                  <div className="relative z-10 space-y-1">
+                    <h3 className={`font-extrabold text-sm leading-snug transition-colors duration-200 ${
+                      isSelected 
+                        ? 'text-white' 
+                        : 'text-slate-800 group-hover:text-indigo-600'
+                    }`}>
+                      {dept.name}
+                    </h3>
                   </div>
                 </button>
               );
