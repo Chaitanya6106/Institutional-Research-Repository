@@ -34,7 +34,6 @@ const DEPARTMENTS_UI = [
   },
 ];
 
-// File list mappings based on repository folders
 const FOLDER_PAPERS = {
   'Artificial Intelligence & ML': [
     'A Review on Explainable Artificial',
@@ -98,7 +97,6 @@ const FOLDER_PAPERS = {
   ]
 };
 
-// Exact publication year mapping per paper title/keyword
 const EXACT_PAPER_YEARS = {
   'cracks in the foundation': '2021',
   'digital infrastructure in astrophys': '2022',
@@ -245,40 +243,46 @@ export default function Home() {
 
   const loadBookmarks = (allDbPapers = []) => {
     try {
-      // Check multiple common key variations for saved bookmarks
-      const raw1 = localStorage.getItem('bookmarkedPapers');
-      const raw2 = localStorage.getItem('bookmarked_papers');
-      const raw3 = localStorage.getItem('bookmarks');
+      // Keys checked across paper view implementations
+      const keys = ['bookmarkedPapers', 'bookmarked_papers', 'bookmarks', 'saved_papers'];
+      let rawBookmarks = null;
 
-      const parsed = JSON.parse(raw1 || raw2 || raw3 || '[]');
-
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        // Handle case where array stores objects or plain IDs/strings
-        if (typeof parsed[0] === 'object' && parsed[0] !== null) {
-          setBookmarkedPapers(parsed);
-        } else if (allDbPapers.length > 0) {
-          const matched = allDbPapers.filter(p => 
-            parsed.includes(p.id) || parsed.includes(p.paper_id) || parsed.includes(String(p.id)) || parsed.includes(String(p.paper_id))
-          );
-          setBookmarkedPapers(matched);
+      for (const k of keys) {
+        const val = localStorage.getItem(k);
+        if (val) {
+          rawBookmarks = JSON.parse(val);
+          break;
         }
-      } else {
+      }
+
+      if (!rawBookmarks || !Array.isArray(rawBookmarks)) {
         setBookmarkedPapers([]);
+        return;
+      }
+
+      // If stored as objects
+      if (typeof rawBookmarks[0] === 'object' && rawBookmarks[0] !== null) {
+        setBookmarkedPapers(rawBookmarks);
+      } else if (allDbPapers.length > 0) {
+        // Stored as paper IDs/strings
+        const idSet = new Set(rawBookmarks.map(id => String(id)));
+        const matched = allDbPapers.filter(p => idSet.has(String(p.id)) || idSet.has(String(p.paper_id)));
+        setBookmarkedPapers(matched);
       }
     } catch (e) {
-      console.error('Failed to parse bookmarks:', e);
+      console.error('Error resolving bookmarks:', e);
       setBookmarkedPapers([]);
     }
   };
 
   const removeBookmark = (paperId) => {
-    const updated = bookmarkedPapers.filter(p => (p.id || p.paper_id) !== paperId);
+    const updated = bookmarkedPapers.filter(p => String(p.id || p.paper_id) !== String(paperId));
     setBookmarkedPapers(updated);
 
-    // Sync across localStorage keys
-    localStorage.setItem('bookmarkedPapers', JSON.stringify(updated));
+    const updatedIds = updated.map(p => p.id || p.paper_id);
+    localStorage.setItem('bookmarkedPapers', JSON.stringify(updatedIds));
     localStorage.setItem('bookmarked_papers', JSON.stringify(updated));
-    localStorage.setItem('bookmarks', JSON.stringify(updated.map(p => p.id || p.paper_id)));
+    localStorage.setItem('bookmarks', JSON.stringify(updatedIds));
   };
 
   const fetchPapers = async () => {
@@ -298,13 +302,8 @@ export default function Home() {
         return;
       }
 
-      if (!allPapers) {
-        setRecentPapers([]);
-        setIsLoading(false);
-        return;
-      }
-
-      loadBookmarks(allPapers);
+      const paperList = allPapers || [];
+      loadBookmarks(paperList);
 
       if (selectedDepts.length > 0) {
         let finalFiltered = [];
@@ -312,7 +311,7 @@ export default function Home() {
         selectedDepts.forEach(deptName => {
           const allowedTitles = FOLDER_PAPERS[deptName] || [];
 
-          const deptPapers = allPapers.filter(paper => {
+          const deptPapers = paperList.filter(paper => {
             const paperTitle = (paper.title || paper.pdf_path || '').toLowerCase().trim();
             return allowedTitles.some(allowed => 
               paperTitle.includes(allowed.toLowerCase().trim())
@@ -324,7 +323,7 @@ export default function Home() {
 
         setRecentPapers(finalFiltered);
       } else {
-        setRecentPapers(allPapers);
+        setRecentPapers(paperList);
       }
     } catch (err) {
       console.error('Error fetching papers:', err);
@@ -377,7 +376,7 @@ export default function Home() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         
-        {/* Department Filter Section with Bookmarks Quick Button */}
+        {/* Department Filter Header with Integrated Bookmarks Button */}
         <section>
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -393,14 +392,14 @@ export default function Home() {
             </div>
 
             <div className="flex items-center gap-3">
-              {/* Compact Bookmark Modal Trigger Button */}
+              {/* Professional Bookmark Trigger Button */}
               <button
                 onClick={() => setShowBookmarkModal(true)}
-                className="inline-flex items-center gap-2 bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-900 px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm"
+                className="inline-flex items-center gap-2 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-700 px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm"
               >
-                <Bookmark className="w-4 h-4 fill-amber-500 text-amber-600" />
-                <span>Bookmarks</span>
-                <span className="bg-amber-200/80 text-amber-900 px-2 py-0.5 rounded-full text-[11px] font-black">
+                <Bookmark className="w-4 h-4 fill-indigo-600 text-indigo-600" />
+                <span>Saved Bookmarks</span>
+                <span className="bg-indigo-600 text-white px-2 py-0.5 rounded-full text-[11px] font-extrabold">
                   {bookmarkedPapers.length}
                 </span>
               </button>
@@ -617,8 +616,8 @@ export default function Home() {
           <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-slate-200 space-y-4 relative animate-in fade-in zoom-in duration-200">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
-                <Bookmark className="w-5 h-5 fill-amber-500 text-amber-600" />
-                <h3 className="text-lg font-bold text-slate-900">Bookmarked Research</h3>
+                <Bookmark className="w-5 h-5 fill-indigo-600 text-indigo-600" />
+                <h3 className="text-lg font-bold text-slate-900">Your Bookmarked Research</h3>
               </div>
               <button
                 onClick={() => setShowBookmarkModal(false)}
@@ -643,7 +642,7 @@ export default function Home() {
                   return (
                     <div 
                       key={paperId}
-                      className="p-3 rounded-xl border border-slate-200 hover:border-indigo-300 bg-slate-50/50 flex items-center justify-between gap-4 transition"
+                      className="p-3.5 rounded-xl border border-slate-200 hover:border-indigo-300 bg-slate-50/50 flex items-center justify-between gap-4 transition"
                     >
                       <div className="space-y-1">
                         <Link 
@@ -654,7 +653,7 @@ export default function Home() {
                           📄 {paper.title}
                         </Link>
                         <div className="flex items-center gap-2 text-xs text-slate-500">
-                          <span className="bg-slate-200/80 px-2 py-0.5 rounded text-indigo-600 font-medium">
+                          <span className="bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded font-medium">
                             {getDeptTag(paper)}
                           </span>
                           <span>•</span>
@@ -662,7 +661,7 @@ export default function Home() {
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 shrink-0">
                         <Link
                           to={`/paper/${paperId}`}
                           onClick={() => setShowBookmarkModal(false)}
