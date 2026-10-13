@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import { 
   Search, FileText, Download, TrendingUp, Users, BookMarked, 
-  Cpu, Zap, Cog, Building2, Brain, ChevronRight, Sparkles, Award, ExternalLink 
+  Cpu, Zap, Cog, Building2, Brain, ChevronRight, Award, ExternalLink 
 } from 'lucide-react';
 
 const DEPARTMENTS_UI = [
@@ -299,30 +299,36 @@ export default function Home() {
   return (
     <div className="space-y-12 pb-16">
       
-      {/* Hero Header */}
-      <section className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white py-16 px-4 text-center rounded-b-3xl shadow-lg relative overflow-hidden">
-        <div className="max-w-4xl mx-auto space-y-6 relative z-10">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-            <Sparkles className="w-3.5 h-3.5" /> Institutional Repository Platform
-          </span>
+      {/* Hero Header with High-Tech Network Overlay Background */}
+      <section className="relative text-white py-20 px-4 text-center rounded-b-3xl shadow-xl overflow-hidden bg-slate-900">
+        
+        {/* Academic / Tech Network Background Image with Dark Masking */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center mix-blend-overlay opacity-30"
+          style={{
+            backgroundImage: `url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop')`
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-900/80 via-slate-900/90 to-slate-950" />
 
-          <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">
+        <div className="max-w-4xl mx-auto space-y-6 relative z-10">
+          <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-white drop-shadow-md">
             Institutional Research Repository
           </h1>
-          <p className="text-slate-300 text-lg max-w-2xl mx-auto">
+          <p className="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto font-normal leading-relaxed">
             Discover, cite, and contribute to academic papers, student theses, and faculty publications.
           </p>
 
-          <form onSubmit={handleSearchSubmit} className="relative max-w-2xl mx-auto flex items-center">
+          <form onSubmit={handleSearchSubmit} className="relative max-w-2xl mx-auto flex items-center pt-2">
             <Search className="absolute left-4 w-5 h-5 text-slate-400" />
             <input
               type="text"
               placeholder="Search by title, student, faculty, or key terms..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-32 py-4 rounded-xl bg-white text-slate-900 placeholder-slate-400 shadow-xl focus:outline-none focus:ring-4 focus:ring-indigo-500/50 text-sm sm:text-base font-medium"
+              className="w-full pl-12 pr-32 py-4 rounded-xl bg-white text-slate-900 placeholder-slate-400 shadow-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/50 text-sm sm:text-base font-medium"
             />
-            <button type="submit" className="absolute right-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2.5 rounded-lg text-sm transition">
+            <button type="submit" className="absolute right-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2.5 rounded-lg text-sm transition shadow-md">
               Search
             </button>
           </form>
