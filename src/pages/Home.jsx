@@ -299,20 +299,30 @@ export default function Home() {
   return (
     <div className="space-y-12 pb-16">
       
-      {/* Hero Header with High-Tech Network Overlay Background */}
-      <section className="relative text-white py-20 px-4 text-center rounded-b-3xl shadow-xl overflow-hidden bg-slate-900">
+      {/* Hero Header - Dual Blend Campus Architecture & Research Data */}
+      <section className="relative text-white py-20 px-4 text-center rounded-b-3xl shadow-xl overflow-hidden bg-slate-950">
         
-        {/* Academic / Tech Network Background Image with Dark Masking */}
+        {/* Layer 1: Institutional Campus Architecture Texture */}
         <div 
-          className="absolute inset-0 bg-cover bg-center mix-blend-overlay opacity-30"
+          className="absolute inset-0 bg-cover bg-center mix-blend-luminosity opacity-25 scale-105 transition-transform duration-1000"
           style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop')`
+            backgroundImage: `url('https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?q=80&w=2069&auto=format&fit=crop')`
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-900/80 via-slate-900/90 to-slate-950" />
+
+        {/* Layer 2: Research Paper & Academic Data Texture Overlay */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center mix-blend-color-dodge opacity-20"
+          style={{
+            backgroundImage: `url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=2000&auto=format&fit=crop')`
+          }}
+        />
+
+        {/* Layer 3: Vignette Gradient Overlay for Readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-slate-950/90 to-slate-950" />
 
         <div className="max-w-4xl mx-auto space-y-6 relative z-10">
-          <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-white drop-shadow-md">
+          <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-white drop-shadow-lg">
             Institutional Research Repository
           </h1>
           <p className="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto font-normal leading-relaxed">
