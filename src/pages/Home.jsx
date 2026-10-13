@@ -141,13 +141,53 @@ const EXACT_PAPER_YEARS = {
   'xiaomirobotics1': '2025'
 };
 
+// Keywords that return real results from your dataset
 const TRENDING_KEYWORDS = [
-  'Deep Learning',
+  'Artificial Intelligence',
   'Robotics',
-  'IoT & Edge Sensing',
-  'Structural Systems',
+  'Internet of Things',
+  'Structural',
   'Software Engineering',
   'Optimization'
+];
+
+// Rotating Featured Paper Pool (Changes on Page Refresh)
+const FEATURED_POOL = [
+  {
+    id: 1,
+    dept: 'Civil Engineering',
+    title: 'Neural Extended Kalman Filters for Learning and Predicting Dynamics of Structural Systems',
+    abstract: 'Integrates Extended Kalman Filtering with neural network formulations to model nonlinear structural dynamics under seismic and environmental perturbations.',
+    authors: 'Wei Liu, Zhilu Lai, Kiran Bacsa, Eleni Chatzi'
+  },
+  {
+    id: 12,
+    dept: 'Computer Science',
+    title: 'Morescient GAI for Software Engineering (Extended Version)',
+    abstract: 'An augmented generative AI framework incorporating structural domain constraints to improve code synthesis fidelity and eliminate hallucinated dependencies.',
+    authors: 'Marcus Kessel, Colin Atkinson'
+  },
+  {
+    id: 21,
+    dept: 'Electronics & Telecommunication',
+    title: 'Fine Time Measurement for the Internet of Things: A Practical Approach Using ESP32',
+    abstract: 'Demonstrates low-cost Wi-Fi Fine Time Measurement (FTM) hardware implementation on ESP32 nodes, enabling decimeter-level indoor positioning.',
+    authors: 'Valentín Barral, Omar Campos, Tomás Domínguez-Bolaño, et al.'
+  },
+  {
+    id: 36,
+    dept: 'Mechanical Engineering',
+    title: 'Xiaomi-Robotics-1: Scaling Vision-Language-Action Models with 100K Hours Trajectories',
+    abstract: 'Presents a foundation Vision-Language-Action model trained on over 100,000 real-world robotic interaction trajectories for dexterous spatial manipulation.',
+    authors: 'Xiaomi Robotics R&D Team'
+  },
+  {
+    id: 7,
+    dept: 'Artificial Intelligence & ML',
+    title: 'A Review on Explainable Artificial Intelligence in Healthcare Applications',
+    abstract: 'Surveys recent advancements in interpretable deep learning architectures and feature attribution methods for clinical diagnostic support systems.',
+    authors: 'Academic AI & Health Research Group'
+  }
 ];
 
 const getPaperYear = (paper) => {
@@ -181,10 +221,15 @@ export default function Home() {
   const [selectedDepts, setSelectedDepts] = useState([]);
   const [recentPapers, setRecentPapers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [featuredPaper, setFeaturedPaper] = useState(FEATURED_POOL[0]);
 
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Pick a random featured paper every time the component loads
+    const randomIndex = Math.floor(Math.random() * FEATURED_POOL.length);
+    setFeaturedPaper(FEATURED_POOL[randomIndex]);
+
     fetchPapers();
   }, [selectedDepts]);
 
@@ -359,27 +404,27 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Featured Research Paper */}
+            {/* Dynamic Featured Research Paper Card */}
             <div className="bg-gradient-to-br from-indigo-950 via-slate-900 to-slate-900 text-white p-6 rounded-2xl shadow-md border border-indigo-900/50 space-y-4">
               <div className="flex items-center justify-between text-xs font-semibold text-indigo-300">
                 <span className="flex items-center gap-1.5"><Award className="w-4 h-4 text-amber-400" /> Featured Publication</span>
                 <span className="bg-indigo-500/20 text-indigo-200 px-2.5 py-0.5 rounded-full border border-indigo-500/30">
-                  Civil Engineering
+                  {featuredPaper.dept}
                 </span>
               </div>
 
               <h3 className="text-lg font-bold leading-snug text-white">
-                Neural Extended Kalman Filters for Learning and Predicting Dynamics of Structural Systems
+                {featuredPaper.title}
               </h3>
 
               <p className="text-xs text-slate-300 leading-relaxed">
-                A physics-informed deep learning strategy integrating Extended Kalman Filtering (EKF) with neural network formulations to model nonlinear structural dynamics under seismic and environmental perturbations.
+                {featuredPaper.abstract}
               </p>
 
               <div className="pt-2 flex items-center justify-between border-t border-slate-800/80">
-                <span className="text-[11px] text-slate-400">Authors: Wei Liu, Zhilu Lai, Kiran Bacsa, Eleni Chatzi</span>
+                <span className="text-[11px] text-slate-400">Authors: {featuredPaper.authors}</span>
                 <Link
-                  to="/paper/1"
+                  to={`/paper/${featuredPaper.id}`}
                   className="inline-flex items-center gap-1 text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white px-3.5 py-2 rounded-lg transition"
                 >
                   View Paper <ExternalLink className="w-3.5 h-3.5" />
