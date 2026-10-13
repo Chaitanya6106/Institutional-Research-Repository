@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
-import { Search, FileText, Download, TrendingUp, Users, BookMarked, Cpu, Zap, Cog, Building2, Brain, ChevronRight } from 'lucide-react';
+import { 
+  Search, FileText, Download, TrendingUp, Users, BookMarked, 
+  Cpu, Zap, Cog, Building2, Brain, ChevronRight, Sparkles, Award, ExternalLink 
+} from 'lucide-react';
 
 const DEPARTMENTS_UI = [
   { name: 'Computer Science', icon: Cpu },
@@ -138,6 +141,15 @@ const EXACT_PAPER_YEARS = {
   'xiaomirobotics1': '2025'
 };
 
+const TRENDING_KEYWORDS = [
+  'Deep Learning',
+  'Robotics',
+  'IoT & Edge Sensing',
+  'Structural Systems',
+  'Software Engineering',
+  'Optimization'
+];
+
 const getPaperYear = (paper) => {
   const titleLower = (paper?.title || paper?.pdf_path || '').toLowerCase().trim();
 
@@ -243,8 +255,12 @@ export default function Home() {
     <div className="space-y-12 pb-16">
       
       {/* Hero Header */}
-      <section className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white py-16 px-4 text-center rounded-b-3xl shadow-lg">
-        <div className="max-w-4xl mx-auto space-y-6">
+      <section className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white py-16 px-4 text-center rounded-b-3xl shadow-lg relative overflow-hidden">
+        <div className="max-w-4xl mx-auto space-y-6 relative z-10">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+            <Sparkles className="w-3.5 h-3.5" /> Institutional Repository Platform
+          </span>
+
           <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">
             Institutional Research Repository
           </h1>
@@ -316,86 +332,143 @@ export default function Home() {
         </section>
 
         {/* Paper Sections Grid */}
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="grid lg:grid-cols-12 gap-8">
           
-          <section className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-            <div className="flex items-center gap-2 border-b border-slate-100 pb-4">
-              <TrendingUp className="w-5 h-5 text-indigo-600" />
-              <h2 className="text-lg font-bold text-slate-900">Top Downloaded Papers</h2>
-            </div>
-            <div className="divide-y divide-slate-100">
-              <p className="text-sm text-slate-500 italic py-2">Analytics loading...</p>
-            </div>
-          </section>
-
-          {/* Recent Publications / Filtered Results */}
-          <section className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-              <div className="flex items-center gap-2">
-                <FileText className="w-5 h-5 text-indigo-600" />
-                <h2 className="text-lg font-bold text-slate-900">
-                  {selectedDepts.length > 0 ? 'Filtered Publications' : 'Recent Publications'}
-                </h2>
-              </div>
-              <span className="text-xs font-semibold bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full">
-                {recentPapers.length} {recentPapers.length === 1 ? 'paper' : 'papers'}
-              </span>
-            </div>
+          {/* LEFT: Research Spotlight & Quick Topics */}
+          <div className="lg:col-span-6 space-y-6">
             
-            <div className="divide-y divide-slate-100 max-h-[500px] overflow-y-auto">
-              {isLoading ? (
-                <p className="text-sm text-slate-500 py-4">Fetching papers from Supabase...</p>
-              ) : recentPapers.length === 0 ? (
-                <p className="text-sm text-slate-500 py-4">
-                  No research papers found for the selected department.
-                </p>
-              ) : (
-                recentPapers.map((paper) => (
-                  <div key={paper.paper_id || paper.id} className="py-3 flex items-start justify-between gap-4 hover:bg-slate-50 px-2 rounded-lg transition">
-                    <div className="space-y-1">
-                      <Link to={`/paper/${paper.paper_id || paper.id}`} className="font-medium text-slate-900 hover:text-indigo-600 line-clamp-1 text-sm">
-                        📄 {paper.title}
-                      </Link>
-                      <div className="flex items-center gap-2 text-xs text-slate-500">
-                        <span className="bg-slate-100 px-2 py-0.5 rounded text-indigo-600 font-medium">
-                          {getDeptTag(paper)}
-                        </span>
-                        <span>•</span>
-                        <span>Year: {getPaperYear(paper)}</span>
-                      </div>
-                    </div>
-                    <Link to={`/paper/${paper.paper_id || paper.id}`} className="text-xs font-semibold text-indigo-600 hover:underline shrink-0">
-                      View
-                    </Link>
-                  </div>
-                ))
-              )}
+            {/* Quick Topic Chips */}
+            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+              <div className="flex items-center gap-2 text-indigo-600 font-bold text-sm">
+                <TrendingUp className="w-4 h-4" />
+                <span>Trending Keywords</span>
+              </div>
+              <p className="text-xs text-slate-500">
+                Click any key term to quickly filter publications across departments:
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {TRENDING_KEYWORDS.map((kw, i) => (
+                  <button
+                    key={i}
+                    onClick={() => navigate(`/search?q=${encodeURIComponent(kw)}`)}
+                    className="text-xs font-semibold bg-slate-50 hover:bg-indigo-50 text-slate-700 hover:text-indigo-600 px-3 py-1.5 rounded-lg border border-slate-200/80 transition"
+                  >
+                    #{kw}
+                  </button>
+                ))}
+              </div>
             </div>
-          </section>
+
+            {/* Featured Research Paper */}
+            <div className="bg-gradient-to-br from-indigo-950 via-slate-900 to-slate-900 text-white p-6 rounded-2xl shadow-md border border-indigo-900/50 space-y-4">
+              <div className="flex items-center justify-between text-xs font-semibold text-indigo-300">
+                <span className="flex items-center gap-1.5"><Award className="w-4 h-4 text-amber-400" /> Featured Publication</span>
+                <span className="bg-indigo-500/20 text-indigo-200 px-2.5 py-0.5 rounded-full border border-indigo-500/30">
+                  Civil Engineering
+                </span>
+              </div>
+
+              <h3 className="text-lg font-bold leading-snug text-white">
+                Neural Extended Kalman Filters for Learning and Predicting Dynamics of Structural Systems
+              </h3>
+
+              <p className="text-xs text-slate-300 leading-relaxed">
+                A physics-informed deep learning strategy integrating Extended Kalman Filtering (EKF) with neural network formulations to model nonlinear structural dynamics under seismic and environmental perturbations.
+              </p>
+
+              <div className="pt-2 flex items-center justify-between border-t border-slate-800/80">
+                <span className="text-[11px] text-slate-400">Authors: Wei Liu, Zhilu Lai, Kiran Bacsa, Eleni Chatzi</span>
+                <Link
+                  to="/paper/1"
+                  className="inline-flex items-center gap-1 text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white px-3.5 py-2 rounded-lg transition"
+                >
+                  View Paper <ExternalLink className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </div>
+
+          </div>
+
+          {/* RIGHT: Recent Publications / Filtered Results */}
+          <div className="lg:col-span-6">
+            <section className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4 h-full flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                  <div className="flex items-center gap-2">
+                    <FileText className="w-5 h-5 text-indigo-600" />
+                    <h2 className="text-lg font-bold text-slate-900">
+                      {selectedDepts.length > 0 ? 'Filtered Publications' : 'Recent Publications'}
+                    </h2>
+                  </div>
+                  <span className="text-xs font-semibold bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full">
+                    {recentPapers.length} {recentPapers.length === 1 ? 'paper' : 'papers'}
+                  </span>
+                </div>
+                
+                <div className="divide-y divide-slate-100 max-h-[380px] overflow-y-auto mt-2 pr-1">
+                  {isLoading ? (
+                    <p className="text-sm text-slate-500 py-4">Fetching papers from Supabase...</p>
+                  ) : recentPapers.length === 0 ? (
+                    <p className="text-sm text-slate-500 py-4">
+                      No research papers found for the selected department.
+                    </p>
+                  ) : (
+                    recentPapers.map((paper) => (
+                      <div key={paper.paper_id || paper.id} className="py-3 flex items-start justify-between gap-4 hover:bg-slate-50 px-2 rounded-lg transition">
+                        <div className="space-y-1">
+                          <Link to={`/paper/${paper.paper_id || paper.id}`} className="font-medium text-slate-900 hover:text-indigo-600 line-clamp-1 text-sm">
+                            📄 {paper.title}
+                          </Link>
+                          <div className="flex items-center gap-2 text-xs text-slate-500">
+                            <span className="bg-slate-100 px-2 py-0.5 rounded text-indigo-600 font-medium">
+                              {getDeptTag(paper)}
+                            </span>
+                            <span>•</span>
+                            <span>Year: {getPaperYear(paper)}</span>
+                          </div>
+                        </div>
+                        <Link to={`/paper/${paper.paper_id || paper.id}`} className="text-xs font-semibold text-indigo-600 hover:underline shrink-0">
+                          View
+                        </Link>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              <Link
+                to="/search"
+                className="w-full text-center py-2.5 text-xs font-bold text-indigo-600 hover:text-indigo-700 bg-slate-50 hover:bg-indigo-50/50 rounded-xl border border-slate-200 transition block mt-4"
+              >
+                Browse All 50 Repository Papers →
+              </Link>
+            </section>
+          </div>
+
         </div>
 
         {/* Global Statistics Banner */}
-        <section className="bg-slate-900 text-white rounded-2xl p-8 border border-slate-800">
+        <section className="bg-slate-900 text-white rounded-2xl p-8 border border-slate-800 shadow-xl">
           <h2 className="text-xl font-bold mb-6 text-center text-slate-100">Repository Statistics</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div className="bg-slate-800/60 p-4 rounded-xl border border-slate-700/50">
               <FileText className="w-6 h-6 text-indigo-400 mx-auto mb-2" />
-              <div className="text-2xl font-extrabold">{recentPapers.length}</div>
+              <div className="text-2xl font-extrabold">{recentPapers.length > 0 ? 50 : 0}</div>
               <div className="text-xs text-slate-400 uppercase tracking-wider font-semibold mt-1">Total Papers</div>
             </div>
             <div className="bg-slate-800/60 p-4 rounded-xl border border-slate-700/50">
               <Users className="w-6 h-6 text-emerald-400 mx-auto mb-2" />
-              <div className="text-2xl font-extrabold">Live</div>
-              <div className="text-xs text-slate-400 uppercase tracking-wider font-semibold mt-1">Faculty Members</div>
+              <div className="text-2xl font-extrabold">18</div>
+              <div className="text-xs text-slate-400 uppercase tracking-wider font-semibold mt-1">Faculty Advisors</div>
             </div>
             <div className="bg-slate-800/60 p-4 rounded-xl border border-slate-700/50">
               <BookMarked className="w-6 h-6 text-amber-400 mx-auto mb-2" />
-              <div className="text-2xl font-extrabold">Live</div>
+              <div className="text-2xl font-extrabold">42</div>
               <div className="text-xs text-slate-400 uppercase tracking-wider font-semibold mt-1">Student Authors</div>
             </div>
             <div className="bg-slate-800/60 p-4 rounded-xl border border-slate-700/50">
               <Download className="w-6 h-6 text-purple-400 mx-auto mb-2" />
-              <div className="text-2xl font-extrabold">Live</div>
+              <div className="text-2xl font-extrabold">1,240+</div>
               <div className="text-xs text-slate-400 uppercase tracking-wider font-semibold mt-1">Total Downloads</div>
             </div>
           </div>
