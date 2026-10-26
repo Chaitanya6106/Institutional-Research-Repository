@@ -1,4 +1,3 @@
-
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   FileText,
@@ -40,10 +39,16 @@ export default function FacultyPortal() {
       const { data: profile, error: profileError } = await supabase
         .from('users')
         .select('user_id, name, email, role')
-        .eq('email', user.email)
-        .single();
+        .ilike('email', user.email)
+        .maybeSingle();
 
       if (profileError) throw profileError;
+
+      if (!profile) {
+        throw new Error(
+          `No profile was found in public.users for ${user.email}. Check the users table email and user_id.`
+        );
+      }
 
       const role = (profile.role || '').toLowerCase().trim();
 
@@ -58,7 +63,7 @@ export default function FacultyPortal() {
         .select(
           'id, student_id, title, faculty_guide, abstract, pdf_path, status, feedback, created_at'
         )
-        .eq('status', 'Pending Review')
+        .ilike('status', 'Pending Review')
         .order('created_at', { ascending: false });
 
       // Admins can view all pending submissions.
@@ -267,10 +272,10 @@ console.log('Faculty papers query error:', error);
         </div>
       ) : papers.length === 0 ? (
         <div className="rounded-xl border border-dashed bg-slate-50 p-8 text-center text-slate-600">
-          No pending papers found for this faculty account.
-          Check that the assigned faculty name matches the faculty
-          profile name and that the Supabase SELECT policy permits
-          this account to read submissions.
+          No pending submissions were returned by Supabase.
+          This page does not filter by faculty guide. Confirm the paper status
+          is "Pending Review" and that the Supabase SELECT RLS policy allows
+          this signed-in faculty/researcher/admin to read all pending submissions.
         </div>
       ) : (
         <div className="grid gap-4">
