@@ -63,17 +63,11 @@ export default function FacultyPortal() {
 
       // Admins can view all pending submissions.
       // Faculty/researchers see papers assigned to their profile name.
-      if (role !== 'admin') {
-        if (!profile.name?.trim()) {
-          throw new Error(
-            'Your faculty profile does not have a name configured.'
-          );
-        }
-
-        query = query.eq('faculty_guide', profile.name.trim());
-      }
+     
 
       const { data, error } = await query;
+      console.log('Faculty papers query result:', data);
+console.log('Faculty papers query error:', error);
 
       if (error) throw error;
 
